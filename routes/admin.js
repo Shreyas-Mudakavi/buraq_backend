@@ -31,7 +31,6 @@ router.post("/register", adminRegister);
 
 // for users
 router.get("/all-users", auth, isAdmin, getAllUsers);
-router.get("/get-users-num", auth, isAdmin, getUsersNum);
 router.get("/user/:id", auth, isAdmin, getUser);
 router.put("/update-user/:id", auth, isAdmin, updateUser);
 router.put("/verify-user/:id", auth, isAdmin, verifyUser);
