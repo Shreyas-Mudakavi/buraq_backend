@@ -35,6 +35,9 @@ const userSchema = new Schema(
       enum: ["car-owner", "partner-driver", "buraq moto", "admin", "passenger"],
       required: true,
     },
+    proofResidence: {
+      type: String,
+    },
     license: {
       imageUrl: {
         type: String,

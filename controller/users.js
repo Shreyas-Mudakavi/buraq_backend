@@ -98,15 +98,19 @@ exports.login = async (req, res, next) => {
 };
 
 exports.verifyMobileNumber = async (req, res, next) => {
-  const { mobile } = req.body;
+  const { mobile, password } = req.body;
 
   try {
     const user = await User.findOne({ mobile: mobile });
 
     if (!user) {
-      res
-        .status(404)
-        .json({ msg: "User with above mobile number does not exist!" });
+      res.status(404).json({ msg: "Incorrect mobile or password." });
+      return;
+    }
+
+    const decryptedPw = await bcrypt.compare(password, user.password);
+    if (!decryptedPw) {
+      res.status(400).json({ msg: "Incorrect mobile or password." });
       return;
     }
 
