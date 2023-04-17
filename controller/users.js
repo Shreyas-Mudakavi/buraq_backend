@@ -138,6 +138,7 @@ exports.updateProfile = async (req, res, next) => {
     email,
     paymentMode,
     rating,
+    role,
   } = req.body;
 
   try {
@@ -151,6 +152,7 @@ exports.updateProfile = async (req, res, next) => {
         email,
         paymentMode,
         rating,
+        role,
       },
       { new: true }
     );
