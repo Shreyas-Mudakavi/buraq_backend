@@ -114,7 +114,15 @@ exports.verifyMobileNumber = async (req, res, next) => {
       return;
     }
 
-    res.status(200).json(user);
+    const token = jwt.sign(
+      {
+        userId: user._id,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ user, token });
   } catch (err) {
     console.log("verify mobile err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
