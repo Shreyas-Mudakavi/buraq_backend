@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 
 router.post("/add-vehicle", auth, addVehicle);
-router.get("/all", getAllVehicle);
+router.get("/all", auth, getAllVehicle);
 router.get("/:id", auth, getVehicle);
 router.put("/update-vehicle/:id", auth, updateVehicle);
 router.delete("/delete/:id", auth, deleteVehicle);

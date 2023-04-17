@@ -44,7 +44,7 @@ exports.getVehicle = async (req, res, next) => {
 
 exports.getAllVehicle = async (req, res, next) => {
   try {
-    const vehicle = await Vehicle.find();
+    const vehicle = await Vehicle.find({ userId: req.userId });
 
     if (!vehicle) {
       res.status(404).json({ msg: "No vehicles found for the current user!" });
