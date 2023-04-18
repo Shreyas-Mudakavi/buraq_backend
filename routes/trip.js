@@ -6,6 +6,6 @@ const { addTrips, getTrips } = require("../controller/trip");
 const router = express.Router();
 
 router.post("/add-trip", auth, addTrips);
-router.post("/get-trips", auth, getTrips);
+router.get("/get-trips", auth, getTrips);
 
 module.exports = router;
