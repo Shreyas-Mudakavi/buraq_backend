@@ -48,6 +48,7 @@ exports.getAllVehicle = async (req, res, next) => {
 
     if (!vehicle) {
       res.status(404).json({ msg: "No vehicles found for the current user!" });
+      return;
     }
 
     res.status(200).json(vehicle);
