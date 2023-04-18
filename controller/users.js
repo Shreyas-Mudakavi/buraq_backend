@@ -137,7 +137,7 @@ exports.updateProfile = async (req, res, next) => {
     mobile,
     email,
     paymentMode,
-    rating,
+    // rating,
     role,
   } = req.body;
 
@@ -151,7 +151,7 @@ exports.updateProfile = async (req, res, next) => {
         mobile,
         email,
         paymentMode,
-        rating,
+        // rating,
         role,
       },
       { new: true }
