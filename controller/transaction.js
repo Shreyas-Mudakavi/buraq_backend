@@ -46,6 +46,22 @@ exports.withdrawal = async (req, res, next) => {
   }
 };
 
+exports.getAllTransactions = async (req, res, next) => {
+  try {
+    const transactions = await Transaction.find({ user: req.userId });
+
+    if (!transactions) {
+      res.status(404).json({ msg: "No transactions exists!" });
+      return;
+    }
+
+    res.status(200).json(transactions);
+  } catch (error) {
+    console.log("get all transactions err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
 exports.updateTransaction = async (req, res, next) => {
   try {
     const { amount, type, description, status } = req.body;
