@@ -49,7 +49,7 @@ exports.addTrips = async (req, res, next) => {
 
 exports.getTrips = async (req, res, next) => {
   try {
-    const trips = await Trip.find({ driver: req.userId });
+    const trips = await Trip.find({ driver: req.userId }).populate("user");
 
     if (!trips) {
       res.status(404).json({ msg: "No trips made!" });
