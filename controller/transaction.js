@@ -46,7 +46,7 @@ exports.withdrawal = async (req, res, next) => {
   }
 };
 
-exports.getAllTransactions = async (req, res, next) => {
+exports.getAll = async (req, res, next) => {
   try {
     const transactions = await Transaction.find({ user: req.userId });
 

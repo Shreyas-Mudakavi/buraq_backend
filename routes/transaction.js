@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/add-transaction", auth, addTransaction);
 router.get("/transaction-withdrawal", auth, withdrawal);
 router.put("/update-transaction/:id", auth, updateTransaction);
-router.get('/all', auth, getAllTransactions)
+router.get("/all", auth, getAll);
 // router.delete("/delete-transaction/:id", auth, deleteTransaction);
 
 module.exports = router;
