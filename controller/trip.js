@@ -47,6 +47,22 @@ exports.addTrips = async (req, res, next) => {
   }
 };
 
+exports.getTrips = async (req, res, next) => {
+  try {
+    const trips = await Trip.find({ driver: req.userId });
+
+    if (!trips) {
+      res.status(404).json({ msg: "No trips made!" });
+      return;
+    }
+
+    res.status(200).json(trips);
+  } catch (error) {
+    console.log("get  trips err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
 //admin
 exports.getAllTrips = async (req, res, next) => {
   try {
