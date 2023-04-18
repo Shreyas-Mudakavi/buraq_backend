@@ -6,6 +6,7 @@ const {
   withdrawal,
   updateTransaction,
   getAllTransactions,
+  getAll,
 } = require("../controller/transaction");
 
 const router = express.Router();
