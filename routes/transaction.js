@@ -10,9 +10,9 @@ const {
 
 const router = express.Router();
 
-router.post("/add-transaction", auth, addTransaction);
-router.get("/transaction-withdrawal", auth, withdrawal);
+// router.post("/add-transaction", auth, addTransaction);
 router.put("/update-transaction/:id", auth, updateTransaction);
+router.post("/transaction-withdrawal", auth, withdrawal);
 router.get("/all", auth, getAll);
 // router.delete("/delete-transaction/:id", auth, deleteTransaction);
 

@@ -30,18 +30,30 @@ exports.addTransaction = async (req, res, next) => {
 };
 
 exports.withdrawal = async (req, res, next) => {
+  const { amount, type, description, status } = req.body;
+
   try {
-    // const transaction = await Transaction.find({ userId: { $eq: req.userId } });
-    const transaction = await Transaction.findOne({ user: req.userId });
+    const newTransaction = new Transaction({
+      user: req.userId,
+      amount: amount,
+      type: type,
+      metadata: {
+        description: description,
+      },
+      status: status,
+    });
 
-    if (!transaction) {
-      res.status(404).json(transaction);
-      return;
-    }
+    // const transactionExists = await Transaction.findOne({ user: req.userId });
+    // if (transactionExists) {
+    //   res.status(409).json({ msg: "Transaction already exists!" });
+    //   return;
+    // }
 
-    res.status(200).json(transaction);
+    const savedTransaction = await newTransaction.save();
+
+    res.status(200).json(savedTransaction);
   } catch (err) {
-    console.log("transaction get err ", err);
+    console.log("transaction withdraw err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
   }
 };
