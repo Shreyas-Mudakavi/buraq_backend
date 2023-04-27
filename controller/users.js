@@ -1,6 +1,13 @@
 const User = require("../models/Users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const client = require("twilio")(
+  process.env.TWILIO_SID,
+  process.env.TWILIO_TOKEN,
+  {
+    lazyLoading: true,
+  }
+);
 
 exports.register = async (req, res, next) => {
   const {
@@ -97,11 +104,43 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.verifyMobileNumber = async (req, res, next) => {
-  const { mobile, password } = req.body;
+exports.sendOtp = async (req, res, next) => {
+  const { countryCode, phoneNumber } = req.body;
+
+  if (!countryCode || !phoneNumber) {
+    return res.status(401).json({ msg: "Enter all Required fields" });
+  }
+  if (phoneNumber.length < 10) {
+    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
+  }
 
   try {
-    const user = await User.findOne({ mobile: mobile });
+    const otpResponse = await client.verify.v2
+      .services("VAc5765b2512a65da35cbf9e3e352d67e6")
+      .verifications.create({
+        to: `+${countryCode}${phoneNumber}`,
+        channel: "sms",
+      });
+
+    res.status(201).json({ msg: "OTP send succesfully!" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+exports.verifyMobileNumber = async (req, res, next) => {
+  const { countryCode, phoneNumber, otp, password } = req.body;
+
+  if (!countryCode || !phoneNumber || !otp || !account_type) {
+    return res.status(401).json({ msg: "Enter all Required fields" });
+  }
+  if (phoneNumber.length < 10) {
+    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
+  }
+
+  try {
+    const user = await User.findOne({ mobile: phoneNumber });
 
     if (!user) {
       res.status(404).json({ msg: "Incorrect mobile or password." });
@@ -114,15 +153,24 @@ exports.verifyMobileNumber = async (req, res, next) => {
       return;
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "7d" }
-    );
+    const verificationResponse = await client.verify.v2
+      .services("VAc5765b2512a65da35cbf9e3e352d67e6")
+      .verificationChecks.create({
+        to: `+${countryCode}${phoneNumber}`,
+        code: otp,
+      });
 
-    res.status(200).json({ user, token });
+    if (verificationResponse.valid) {
+      const token = jwt.sign(
+        {
+          userId: user._id,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "7d" }
+      );
+
+      res.status(200).json({ user, token });
+    }
   } catch (err) {
     console.log("verify mobile err ", err);
     res.status(500).json({ err, msg: "Error from server!" });

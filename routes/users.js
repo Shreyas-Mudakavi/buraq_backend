@@ -7,6 +7,7 @@ const {
   getProfile,
   changePassword,
   verifyMobileNumber,
+  sendOtp,
 } = require("../controller/users");
 const { auth } = require("../middlewares/auth");
 
@@ -16,7 +17,9 @@ router.post("/register", register);
 
 router.post("/login", login);
 
-router.post("/verify-mobile", verifyMobileNumber);
+router.post("/send-otp", sendOtp);
+
+router.post("/verify-otp", verifyMobileNumber);
 
 router.put("/update-profile", auth, updateProfile);
 
