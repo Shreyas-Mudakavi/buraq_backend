@@ -1,6 +1,9 @@
 const User = require("../models/Users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const client = require("twilio")(
   process.env.TWILIO_SID,
   process.env.TWILIO_TOKEN,
