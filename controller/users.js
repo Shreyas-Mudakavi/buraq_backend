@@ -125,9 +125,11 @@ exports.sendOtp = async (req, res, next) => {
         channel: "sms",
       });
 
+    console.log("res ", otpResponse);
+
     res.status(201).json({ msg: "OTP send succesfully!" });
   } catch (error) {
-    console.error(error);
+    console.error("send otp err ", error);
     return res.status(500).json({ msg: "Server Error" });
   }
 };
