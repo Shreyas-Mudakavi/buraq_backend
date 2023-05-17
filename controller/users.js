@@ -214,7 +214,11 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
       );
 
       if (!user) {
-        res.status(404).json({ msg: "User does not exist please register!" });
+        res.status(404).json({
+          msg: "User does not exist please register!",
+          status: "Otp verified!",
+          phoneNumber: phoneNumber,
+        });
         return;
       }
 
