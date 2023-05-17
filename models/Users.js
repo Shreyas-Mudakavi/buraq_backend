@@ -6,34 +6,34 @@ const userSchema = new Schema(
   {
     firstname: {
       type: String,
-      required: true,
+      required: [true, "Firstname is required!"],
     },
     lastname: {
       type: String,
-      required: true,
+      required: [true, "Lastname is required!"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required!"],
       unique: true,
     },
     mobile: {
       type: String,
-      required: true,
+      required: [true, "Mobile is required!"],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Passowrd is required!"],
     },
     city: {
       type: String,
-      required: true,
+      required: [true, "City is required!"],
     },
     role: {
       type: String,
       // default: "car-owner",
       enum: ["car-owner", "partner-driver", "buraq moto", "admin", "passenger"],
-      required: true,
+      required: [true, "Role is required!"],
     },
     proofResidence: {
       type: String,
@@ -58,12 +58,15 @@ const userSchema = new Schema(
     },
     profilePic: {
       type: String,
-      required: true,
+      // required: [true, 'Profile Pic is required!'],
     },
     // rating: {
     //   type: Number,
     //   default: 0,
     // },
+    inviteCode: {
+      type: String,
+    },
     verified: {
       type: Boolean,
       default: false,

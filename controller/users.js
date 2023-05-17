@@ -25,6 +25,7 @@ exports.register = async (req, res, next) => {
     panCard,
     registration,
     profilePic,
+    inviteCode,
   } = req.body;
 
   const salt = await bcrypt.genSalt(10);
@@ -50,6 +51,7 @@ exports.register = async (req, res, next) => {
       panCard: panCard,
       registration: registration,
       profilePic: profilePic,
+      inviteCode,
       verified: verified,
     });
 
@@ -71,7 +73,10 @@ exports.register = async (req, res, next) => {
     res.status(200).json({ savedUser, token });
   } catch (err) {
     console.log("register err ", err);
-    res.status(500).json({ err, msg: "Error from server!" });
+    res.status(500).json({
+      status: "error",
+      errors: err.message,
+    });
   }
 };
 
@@ -103,7 +108,7 @@ exports.login = async (req, res, next) => {
     res.status(200).json({ user, token });
   } catch (err) {
     console.log("login err ", err);
-    res.status(500).json({ err, msg: "Error from server!" });
+    res.status(500).json({ status: "error", errors: err.message });
   }
 };
 
