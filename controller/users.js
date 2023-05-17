@@ -137,7 +137,7 @@ exports.sendOtp = async (req, res, next) => {
 exports.verifyMobileNumber = async (req, res, next) => {
   const { countryCode, phoneNumber, otp, password } = req.body;
 
-  if (!countryCode || !phoneNumber || !otp || !account_type) {
+  if (!countryCode || !phoneNumber || !otp) {
     return res.status(401).json({ msg: "Enter all Required fields" });
   }
   if (phoneNumber.length < 10) {
@@ -146,17 +146,6 @@ exports.verifyMobileNumber = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ mobile: phoneNumber });
-
-    if (!user) {
-      res.status(404).json({ msg: "Incorrect mobile or password." });
-      return;
-    }
-
-    const decryptedPw = await bcrypt.compare(password, user.password);
-    if (!decryptedPw) {
-      res.status(400).json({ msg: "Incorrect mobile or password." });
-      return;
-    }
 
     const verificationResponse = await client.verify.v2
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
@@ -174,7 +163,64 @@ exports.verifyMobileNumber = async (req, res, next) => {
         { expiresIn: "7d" }
       );
 
+      if (!user) {
+        res.status(404).json({ msg: "User does not exist please register!" });
+        return;
+      }
+
+      const decryptedPw = await bcrypt.compare(password, user.password);
+      if (!decryptedPw) {
+        res.status(400).json({ msg: "Incorrect password!" });
+        return;
+      }
+
       res.status(200).json({ user, token });
+    } else {
+      res.status(400).json({ status: "Wrong OTP!" });
+    }
+  } catch (err) {
+    console.log("verify mobile err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
+exports.verifyMobileNumberDriver = async (req, res, next) => {
+  const { countryCode, phoneNumber, otp } = req.body;
+
+  if (!countryCode || !phoneNumber || !otp) {
+    return res.status(401).json({ msg: "Enter all Required fields" });
+  }
+  if (phoneNumber.length < 10) {
+    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
+  }
+
+  try {
+    const user = await User.findOne({ mobile: phoneNumber });
+
+    const verificationResponse = await client.verify.v2
+      .services("VAc5765b2512a65da35cbf9e3e352d67e6")
+      .verificationChecks.create({
+        to: `+${countryCode}${phoneNumber}`,
+        code: otp,
+      });
+
+    if (verificationResponse.valid) {
+      const token = jwt.sign(
+        {
+          userId: user._id,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "7d" }
+      );
+
+      if (!user) {
+        res.status(404).json({ msg: "User does not exist please register!" });
+        return;
+      }
+
+      res.status(200).json({ user, token });
+    } else {
+      res.status(400).json({ status: "Wrong OTP!" });
     }
   } catch (err) {
     console.log("verify mobile err ", err);
