@@ -123,7 +123,7 @@ exports.sendOtp = async (req, res, next) => {
   }
 
   try {
-    const otpResponse = await client.verify.v2
+    const otpResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verifications.create({
         to: `+${countryCode}${phoneNumber}`,
@@ -202,7 +202,7 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
   try {
     const user = await User.findOne({ mobile: phoneNumber });
 
-    const verificationResponse = await client.verify.v2
+    const verificationResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verificationChecks.create({
         to: `+${countryCode}${phoneNumber}`,
@@ -210,14 +210,6 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
       });
 
     if (verificationResponse.valid) {
-      const token = jwt.sign(
-        {
-          userId: user._id,
-        },
-        process.env.JWT_SECRET_KEY,
-        { expiresIn: "7d" }
-      );
-
       if (!user) {
         res.status(404).json({
           msg: "User does not exist please register!",
@@ -228,6 +220,13 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
       }
 
       res.status(200).json({ user, token });
+      const token = jwt.sign(
+        {
+          userId: user._id,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "7d" }
+      );
     } else {
       res.status(400).json({ status: "Wrong OTP!" });
     }
