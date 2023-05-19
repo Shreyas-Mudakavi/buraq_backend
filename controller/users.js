@@ -160,16 +160,11 @@ exports.verifyMobileNumber = async (req, res, next) => {
       });
 
     if (verificationResponse.valid) {
-      const token = jwt.sign(
-        {
-          userId: user._id,
-        },
-        process.env.JWT_SECRET_KEY,
-        { expiresIn: "7d" }
-      );
-
       if (!user) {
-        res.status(404).json({ msg: "User does not exist please register!" });
+        res.status(200).json({
+          status: "Otp verified!",
+          phoneNumber: phoneNumber,
+        });
         return;
       }
 
@@ -180,6 +175,13 @@ exports.verifyMobileNumber = async (req, res, next) => {
       }
 
       res.status(200).json({ user, token });
+      const token = jwt.sign(
+        {
+          userId: user._id,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "7d" }
+      );
     } else {
       res.status(400).json({ status: "Wrong OTP!" });
     }
@@ -211,8 +213,7 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
 
     if (verificationResponse.valid) {
       if (!user) {
-        res.status(404).json({
-          msg: "User does not exist please register!",
+        res.status(200).json({
           status: "Otp verified!",
           phoneNumber: phoneNumber,
         });
