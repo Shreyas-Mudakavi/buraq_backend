@@ -9,6 +9,7 @@ const {
   verifyMobileNumber,
   sendOtp,
   verifyMobileNumberDriver,
+  verifyMobileFrgPwd,
 } = require("../controller/users");
 const { auth } = require("../middlewares/auth");
 
@@ -22,12 +23,14 @@ router.post("/send-otp", sendOtp);
 
 router.post("/verify-otp", verifyMobileNumber);
 
+router.post("/verify-otp-forget", verifyMobileFrgPwd);
+
 router.post("/verify-otp-signup", verifyMobileNumberDriver);
 
 router.put("/update-profile", auth, updateProfile);
 
 router.get("/user-profile", auth, getProfile);
 
-router.put("/reset-password", auth, changePassword);
+router.put("/reset-password", changePassword);
 
 module.exports = router;

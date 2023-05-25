@@ -250,6 +250,52 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
   }
 };
 
+exports.verifyMobileFrgPwd = async (req, res, next) => {
+  const { countryCode, phoneNumber, otp } = req.body;
+
+  if (!countryCode || !phoneNumber || !otp) {
+    return res.status(401).json({ msg: "Enter all Required fields" });
+  }
+  if (phoneNumber.length < 10) {
+    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
+  }
+
+  try {
+    // const user = await User.findOne({ mobile: phoneNumber });
+
+    const verificationResponse = await client.verify
+      .services("VAc5765b2512a65da35cbf9e3e352d67e6")
+      .verificationChecks.create({
+        to: `+${countryCode}${phoneNumber}`,
+        code: otp,
+      });
+
+    if (verificationResponse.valid) {
+      res.status(200).json({
+        status: "Otp verified!",
+        phoneNumber: phoneNumber,
+      });
+      return;
+    }
+
+    // res.status(200).json({ user, token });
+    // const token = jwt.sign(
+    //   {
+    //     userId: user._id,
+    //   },
+    //   process.env.JWT_SECRET_KEY,
+    //   { expiresIn: "7d" }
+    // );
+    else {
+      res.status(400).json({ status: "Wrong OTP!" });
+      return;
+    }
+  } catch (err) {
+    console.log("verify mobile frPw err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
 exports.updateProfile = async (req, res, next) => {
   const {
     firstname,
@@ -303,13 +349,20 @@ exports.getProfile = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
-  const { password } = req.body;
+  const { password, mobile } = req.body;
 
   const salt = await bcrypt.genSalt(10);
   const hashedPwd = await bcrypt.hash(password, salt);
 
   try {
-    const user = await User.findById(req.userId);
+    if (mobile.length < 10) {
+      res
+        .status(401)
+        .json({ msg: "Mobile number should be atleast 10 characters long!" });
+      return;
+    }
+
+    const user = await User.findOne({ mobile: mobile });
 
     if (!user) {
       res.status(404).json({ msg: "User not found!" });
