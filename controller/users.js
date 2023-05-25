@@ -37,6 +37,13 @@ exports.register = async (req, res, next) => {
       verified = true;
     }
 
+    if (mobile.length < 10) {
+      res
+        .status(401)
+        .json({ msg: "Mobile number should be atleast 10 characters long!" });
+      return;
+    }
+
     const newUser = new User({
       firstname: firstname,
       lastname: lastname,
@@ -58,6 +65,12 @@ exports.register = async (req, res, next) => {
     const oldUser = await User.findOne({ email: email });
     if (oldUser) {
       res.status(409).json({ msg: "Email already exists!" });
+      return;
+    }
+
+    const oldUserMobile = await User.findOne({ mobile: mobile });
+    if (oldUserMobile) {
+      res.status(409).json({ msg: "Mobile number already exists!" });
       return;
     }
 

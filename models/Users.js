@@ -20,6 +20,7 @@ const userSchema = new Schema(
     mobile: {
       type: String,
       required: [true, "Mobile is required!"],
+      unique: true,
     },
     password: {
       type: String,
