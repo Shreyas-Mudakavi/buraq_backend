@@ -135,6 +135,9 @@ exports.sendOtp = async (req, res, next) => {
     return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
   }
 
+  console.log("sid ", process.env.TWILIO_SID);
+  console.log("twilio token ", process.env.TWILIO_TOKEN);
+
   try {
     const otpResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
