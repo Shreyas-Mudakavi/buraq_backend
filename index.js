@@ -10,6 +10,7 @@ const bankRoutes = require("./routes/bank");
 const walletRoutes = require("./routes/wallet");
 const transactionRoutes = require("./routes/transaction");
 const tripRoutes = require("./routes/trip");
+const distanceMatrixRoutes = require("./routes/distanceMatrix");
 const adminRoutes = require("./routes/admin");
 
 const app = express();
@@ -38,5 +39,6 @@ app.use("/api/wallet", walletRoutes);
 app.use("/api/bank", bankRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/trip", tripRoutes);
+app.use("/api/cal-distance", distanceMatrixRoutes);
 
 app.use("/api/admin", adminRoutes);
