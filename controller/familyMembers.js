@@ -53,11 +53,19 @@ exports.getFamilyMember = async (req, res, next) => {
 };
 
 exports.updateFamilyMember = async (req, res, next) => {
+  const { name, age, mobile } = req.body;
+
   try {
+    if (mobile?.length < 10) {
+      return res
+        .status(401)
+        .json({ msg: "Phone must be atleast 10 characters" });
+    }
+
     const familyMember = await FamilyMembersModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { $new: true }
+      { name, age, mobile },
+      { $new: true, runValidators: true }
     );
 
     res.status(200).json(familyMember);

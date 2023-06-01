@@ -7,7 +7,7 @@ const {
   getFamilyMember,
   updateFamilyMember,
   deleteFamilyMember,
-} = require("../controller/FamilyMembers");
+} = require("../controller/familyMembers");
 
 const router = express.Router();
 
