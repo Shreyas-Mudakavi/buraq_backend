@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const vehicleSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "Users", required: true },
     brand: {
       type: String,
       required: true,
