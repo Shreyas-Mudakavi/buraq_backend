@@ -34,7 +34,7 @@ exports.addReview = async (req, res, next) => {
     } else {
       const updateRating = await RatingModel.findOne({ driver: driver });
 
-      const updatedRating = await ((updateRating.rating + rating) / (num + 1));
+      const updatedRating = (updateRating.rating + rating) / (num + 1);
 
       updateRating.rating = updatedRating.toFixed(1);
 
