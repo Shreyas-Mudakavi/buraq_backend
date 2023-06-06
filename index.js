@@ -11,6 +11,8 @@ const walletRoutes = require("./routes/wallet");
 const transactionRoutes = require("./routes/transaction");
 const tripRoutes = require("./routes/trip");
 const familyMemberRoutes = require("./routes/familyMembers");
+const lostItemRoutes = require("./routes/lostItem");
+const reviewRoutes = require("./routes/review");
 const adminRoutes = require("./routes/admin");
 
 const app = express();
@@ -40,5 +42,7 @@ app.use("/api/bank", bankRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/trip", tripRoutes);
 app.use("/api/familyMemb", familyMemberRoutes);
+app.use("/api/lostItem", lostItemRoutes);
+app.use("/api/review", reviewRoutes);
 
 app.use("/api/admin", adminRoutes);
