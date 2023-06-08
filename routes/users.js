@@ -31,6 +31,6 @@ router.put("/update-profile", auth, updateProfile);
 
 router.get("/user-profile", auth, getProfile);
 
-router.put("/reset-password", auth, changePassword);
+router.put("/reset-password", changePassword);
 
 module.exports = router;

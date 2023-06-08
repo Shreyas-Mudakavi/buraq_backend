@@ -368,26 +368,17 @@ exports.changePassword = async (req, res, next) => {
       return;
     }
 
-    const user = await User.findOne({ _id: req.userId });
+    const user = await User.findOne({ mobile: mobile });
 
     if (!user) {
       res.status(404).json({ msg: "User not found!" });
       return;
     }
 
-    console.log("old ", user);
-
-    // const updatedUser = await User.findByIdAndUpdate(
-    //   user._id,
-    //   { password: hashedPwd },
-    //   { $new: true }
-    // );
-
     user.password = hashedPwd;
     await user.save();
 
-    console.log("new ", user);
-    res.status(200).json({ msg: "Password updated!", user });
+    res.status(200).json({ msg: "Password updated!" });
   } catch (err) {
     console.log("passwodd update err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
