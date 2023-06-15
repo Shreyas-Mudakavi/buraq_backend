@@ -13,6 +13,7 @@ const client = require("twilio")(
 );
 
 exports.register = async (req, res, next) => {
+  // extracting all the necessary info
   const {
     firstname,
     lastname,
@@ -33,6 +34,7 @@ exports.register = async (req, res, next) => {
 
   let verified = false;
   try {
+    // if the role is passenger i.e. if the passenger is signing up then from start we are setting it as verified true
     if (role === "passenger") {
       verified = true;
     }
@@ -44,6 +46,7 @@ exports.register = async (req, res, next) => {
       return;
     }
 
+    // creating a new user object
     const newUser = new User({
       firstname: firstname,
       lastname: lastname,
@@ -62,12 +65,14 @@ exports.register = async (req, res, next) => {
       verified: verified,
     });
 
+    // checking for the old user, email is unique
     const oldUser = await User.findOne({ email: email });
     if (oldUser) {
       res.status(409).json({ msg: "Email already exists!" });
       return;
     }
 
+    // checking for the old user, mobile is unique
     const oldUserMobile = await User.findOne({ mobile: mobile });
     if (oldUserMobile) {
       res.status(409).json({ msg: "Mobile number already exists!" });
@@ -104,8 +109,6 @@ exports.login = async (req, res, next) => {
       return;
     }
 
-    console.log(user);
-
     const decryptedPw = await bcrypt.compare(password, user.password);
     console.log(decryptedPw);
     if (!decryptedPw) {
@@ -129,6 +132,7 @@ exports.login = async (req, res, next) => {
 };
 
 exports.sendOtp = async (req, res, next) => {
+  // extracting the country code and the mobile number for sending otp
   const { countryCode, phoneNumber } = req.body;
 
   if (!countryCode || !phoneNumber) {
@@ -138,10 +142,8 @@ exports.sendOtp = async (req, res, next) => {
     return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
   }
 
-  console.log("sid ", process.env.TWILIO_SID);
-  console.log("twilio token ", process.env.TWILIO_TOKEN);
-
   try {
+    // sending otp to the provided mobile number
     const otpResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verifications.create({
@@ -159,6 +161,7 @@ exports.sendOtp = async (req, res, next) => {
 };
 
 exports.verifyMobileNumber = async (req, res, next) => {
+  // extracting info for verifying otp for the driver login
   const { countryCode, phoneNumber, otp, password } = req.body;
 
   if (!countryCode || !phoneNumber || !otp) {
@@ -169,8 +172,10 @@ exports.verifyMobileNumber = async (req, res, next) => {
   }
 
   try {
+    // finding the user with the given phone number
     const user = await User.findOne({ mobile: phoneNumber });
 
+    // verifying otp
     const verificationResponse = await client.verify.v2
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verificationChecks.create({
@@ -179,6 +184,7 @@ exports.verifyMobileNumber = async (req, res, next) => {
       });
 
     if (verificationResponse.valid) {
+      // otp verified but user does not exists
       if (!user) {
         res.status(200).json({
           status: "Otp verified!",
@@ -187,6 +193,7 @@ exports.verifyMobileNumber = async (req, res, next) => {
         return;
       }
 
+      // comparing passwords
       const decryptedPw = await bcrypt.compare(password, user.password);
       if (!decryptedPw) {
         res.status(400).json({ msg: "Incorrect password!" });
@@ -211,6 +218,7 @@ exports.verifyMobileNumber = async (req, res, next) => {
 };
 
 exports.verifyMobileNumberDriver = async (req, res, next) => {
+  // extracting info for verifying otp for the driver signup
   const { countryCode, phoneNumber, otp } = req.body;
 
   if (!countryCode || !phoneNumber || !otp) {
@@ -221,8 +229,10 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
   }
 
   try {
+    // finding the user with the given phone number
     const user = await User.findOne({ mobile: phoneNumber });
 
+    // verifying otp
     const verificationResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verificationChecks.create({
@@ -231,6 +241,7 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
       });
 
     if (verificationResponse.valid) {
+      // otp verified but user does not exists
       if (!user) {
         res.status(200).json({
           status: "Otp verified!",
@@ -257,6 +268,7 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
 };
 
 exports.verifyMobileFrgPwd = async (req, res, next) => {
+  // extracting info for verifying otp when forget password is used
   const { countryCode, phoneNumber, otp } = req.body;
 
   if (!countryCode || !phoneNumber || !otp) {
@@ -267,8 +279,6 @@ exports.verifyMobileFrgPwd = async (req, res, next) => {
   }
 
   try {
-    // const user = await User.findOne({ mobile: phoneNumber });
-
     const verificationResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verificationChecks.create({
@@ -282,17 +292,7 @@ exports.verifyMobileFrgPwd = async (req, res, next) => {
         phoneNumber: phoneNumber,
       });
       return;
-    }
-
-    // res.status(200).json({ user, token });
-    // const token = jwt.sign(
-    //   {
-    //     userId: user._id,
-    //   },
-    //   process.env.JWT_SECRET_KEY,
-    //   { expiresIn: "7d" }
-    // );
-    else {
+    } else {
       res.status(400).json({ status: "Wrong OTP!" });
       return;
     }
@@ -303,16 +303,8 @@ exports.verifyMobileFrgPwd = async (req, res, next) => {
 };
 
 exports.updateProfile = async (req, res, next) => {
-  const {
-    firstname,
-    lastname,
-    profilePic,
-    mobile,
-    email,
-    // paymentMode,
-    // rating,
-    role,
-  } = req.body;
+  // extracting info for updating a user
+  const { firstname, lastname, profilePic, mobile, email, role } = req.body;
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -323,8 +315,6 @@ exports.updateProfile = async (req, res, next) => {
         profilePic,
         mobile,
         email,
-        // paymentMode,
-        // rating,
         role,
       },
       { new: true }
@@ -338,7 +328,7 @@ exports.updateProfile = async (req, res, next) => {
 };
 
 exports.getProfile = async (req, res, next) => {
-  console.log(req.userId);
+  // getting user details
   try {
     const user = await User.findById(req.userId);
 
@@ -355,6 +345,7 @@ exports.getProfile = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
+  // changing password
   const { password, mobile } = req.body;
 
   const salt = await bcrypt.genSalt(10);
@@ -385,7 +376,7 @@ exports.changePassword = async (req, res, next) => {
   }
 };
 
-// admin -----------
+// admin side -----------
 exports.adminLogin = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -418,46 +409,46 @@ exports.adminLogin = async (req, res, next) => {
   }
 };
 
-exports.adminRegister = async (req, res, next) => {
-  const { firstname, lastname, email, password, profilePic, city, mobile } =
-    req.body;
+// exports.adminRegister = async (req, res, next) => {
+//   const { firstname, lastname, email, password, profilePic, city, mobile } =
+//     req.body;
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPwd = await bcrypt.hash(password, salt);
+//   const salt = await bcrypt.genSalt(10);
+//   const hashedPwd = await bcrypt.hash(password, salt);
 
-  try {
-    const newAdmin = new User({
-      firstname: firstname,
-      lastname: lastname,
-      email: email,
-      password: hashedPwd,
-      role: "admin",
-      city: city,
-      mobile: mobile,
-      profilePic: profilePic,
-    });
+//   try {
+//     const newAdmin = new User({
+//       firstname: firstname,
+//       lastname: lastname,
+//       email: email,
+//       password: hashedPwd,
+//       role: "admin",
+//       city: city,
+//       mobile: mobile,
+//       profilePic: profilePic,
+//     });
 
-    const oldUser = await User.findOne({ email: email });
-    if (oldUser) {
-      res.status(409).json({ msg: "Email already exists!" });
-      return;
-    }
+//     const oldUser = await User.findOne({ email: email });
+//     if (oldUser) {
+//       res.status(409).json({ msg: "Email already exists!" });
+//       return;
+//     }
 
-    const token = jwt.sign(
-      {
-        userId: newAdmin._id,
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "7d" }
-    );
+//     const token = jwt.sign(
+//       {
+//         userId: newAdmin._id,
+//       },
+//       process.env.JWT_SECRET_KEY,
+//       { expiresIn: "7d" }
+//     );
 
-    const savedAdmin = await newAdmin.save();
-    res.status(200).json({ savedAdmin, token });
-  } catch (err) {
-    console.log("admin register err ", err);
-    res.status(500).json({ err, msg: "Error from server!" });
-  }
-};
+//     const savedAdmin = await newAdmin.save();
+//     res.status(200).json({ savedAdmin, token });
+//   } catch (err) {
+//     console.log("admin register err ", err);
+//     res.status(500).json({ err, msg: "Error from server!" });
+//   }
+// };
 
 exports.getAllUsers = async (req, res, next) => {
   try {
@@ -505,17 +496,7 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
-  const {
-    firstname,
-    lastname,
-    city,
-    role,
-    // license,
-    // panCard,
-    // registration,
-    // profilePic,
-    // verified,
-  } = req.body;
+  const { firstname, lastname, city, role } = req.body;
 
   try {
     const user = await User.findById(req.params.id);
@@ -532,7 +513,6 @@ exports.updateUser = async (req, res, next) => {
         lastname,
         city,
         role,
-        // verified,
       }
       // { new: true }
     );
@@ -545,7 +525,8 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.verifyUser = async (req, res, next) => {
-  const { expiryDate, userId } = req.body;
+  // admin will verify the driver from the license details
+  const { expiryDate } = req.body;
 
   try {
     const user = await User.findById(req.params.id);
@@ -559,14 +540,13 @@ exports.verifyUser = async (req, res, next) => {
     //   { _id: req.params.id },
     //   { $set: { license: { expiration: expiryDate }, verified: true } }
     // );
+
+    // setting the expiry license date to the date sent from admin
     const verifiedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
         "license.expiration": expiryDate,
-        // license: {
-        //   expi
-        // }
-        // expiration: expiryDate,
+
         verified: true,
       },
 
@@ -581,6 +561,7 @@ exports.verifyUser = async (req, res, next) => {
 };
 
 exports.getUsersNum = async (req, res, next) => {
+  // getting number of users
   try {
     const users = await User.find({ role: { $ne: "admin" } });
 

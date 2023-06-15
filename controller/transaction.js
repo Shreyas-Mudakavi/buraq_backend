@@ -1,34 +1,5 @@
 const Transaction = require("../models/TransactionSchema");
 
-exports.addTransaction = async (req, res, next) => {
-  const { amount, type, description, status } = req.body;
-
-  try {
-    const newTransaction = new Transaction({
-      user: req.userId,
-      amount: amount,
-      type: type,
-      metadata: {
-        description: description,
-      },
-      status: status,
-    });
-
-    const transactionExists = await Transaction.findOne({ user: req.userId });
-    if (transactionExists) {
-      res.status(409).json({ msg: "Transaction already exists!" });
-      return;
-    }
-
-    const savedTransaction = await newTransaction.save();
-
-    res.status(200).json(savedTransaction);
-  } catch (err) {
-    console.log("transaction add err ", err);
-    res.status(500).json({ err, msg: "Error from server!" });
-  }
-};
-
 exports.withdrawal = async (req, res, next) => {
   const { amount, type, description, status } = req.body;
 
@@ -91,7 +62,7 @@ exports.updateTransaction = async (req, res, next) => {
   }
 };
 
-//admin
+//admin side
 exports.getAllTransactions = async (req, res, next) => {
   try {
     const transactions = await Transaction.find().populate("user");

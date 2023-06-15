@@ -1,10 +1,12 @@
 const Bank = require("../models/Bank");
 
 exports.addBank = async (req, res, next) => {
+  // extracting all the information needed from the body
   const { firstname, lastname, accountNum, branchName, post_code, city, dob } =
     req.body;
 
   try {
+    // creating new Bank object with all the fields
     const newBank = new Bank({
       userId: req.userId,
       firstname: firstname,
@@ -16,6 +18,8 @@ exports.addBank = async (req, res, next) => {
       dob: dob,
     });
 
+    // now checking whether the particular bank is already added or not.
+    // account number is a unique field
     const alreadyExists = await Bank.findOne({ accountNum: accountNum });
     if (alreadyExists) {
       res.status(409).json({ msg: "Bank already exists!" });
@@ -32,6 +36,7 @@ exports.addBank = async (req, res, next) => {
 };
 
 exports.getBank = async (req, res, next) => {
+  // getting the bank details for the particular user from req.userId that was set in auth.js
   try {
     const bank = await Bank.find({ userId: { $eq: req.userId } });
 

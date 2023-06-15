@@ -1,6 +1,7 @@
 const Trip = require("../models/Trip");
 
 exports.addTrips = async (req, res, next) => {
+  // extracting all the necessary info
   const {
     pickUpAddress,
     latitude,
@@ -47,7 +48,25 @@ exports.addTrips = async (req, res, next) => {
   }
 };
 
-exports.getTrips = async (req, res, next) => {
+exports.getTripsRider = async (req, res, next) => {
+  // getting all the trips made by that user/rider
+  try {
+    const trips = await Trip.find({ user: req.userId }).populate("user");
+
+    if (!trips) {
+      res.status(404).json({ msg: "No trips made!" });
+      return;
+    }
+
+    res.status(200).json(trips);
+  } catch (error) {
+    console.log("get  trips err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
+exports.getTripsDriver = async (req, res, next) => {
+  // getting all the trips made by that driver
   try {
     const trips = await Trip.find({ driver: req.userId }).populate("user");
 
@@ -63,7 +82,19 @@ exports.getTrips = async (req, res, next) => {
   }
 };
 
-//admin
+exports.viewTrip = async (req, res, next) => {
+  // to view any particular trip
+  try {
+    const trip = await Trip.findById(req.params.id).populate("user");
+
+    res.status(200).json(trip);
+  } catch (err) {
+    console.log("get trip err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
+//admin side
 exports.getAllTrips = async (req, res, next) => {
   try {
     const trips = await Trip.find().populate("user");
@@ -117,27 +148,6 @@ exports.updateTrip = async (req, res, next) => {
     res.status(200).json(updatedTrip);
   } catch (err) {
     console.log("update trip err ", err);
-    res.status(500).json({ err, msg: "Error from server!" });
-  }
-};
-
-exports.createTrip = async (req, res, next) => {
-  const {
-    pickUpAddress,
-    latitude,
-    longitude,
-    destinationAddress,
-    destinationLat,
-    destinationLng,
-    status,
-    fare,
-    otp,
-    payment,
-  } = req.body;
-
-  try {
-  } catch (err) {
-    console.log("create admin trip err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
   }
 };

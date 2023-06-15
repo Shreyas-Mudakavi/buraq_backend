@@ -11,9 +11,13 @@ const {
 
 const router = express.Router();
 
-// router.post("/add-transaction", auth, addTransaction);
+// updating particular transaction
 router.put("/update-transaction/:id", auth, updateTransaction);
+
+// adding transaction
 router.post("/transaction-withdrawal", auth, withdrawal);
+
+// getting all the transactions made by that user
 router.get("/all", auth, getAll);
 // router.delete("/delete-transaction/:id", auth, deleteTransaction);
 

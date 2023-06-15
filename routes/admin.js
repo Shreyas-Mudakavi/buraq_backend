@@ -25,9 +25,8 @@ const { getAllTrips, getTrip, updateTrip } = require("../controller/trip");
 
 const router = express.Router();
 
-//admin login and register
+//admin login
 router.post("/login", adminLogin);
-router.post("/register", adminRegister);
 
 // for users
 router.get("/all-users", auth, isAdmin, getAllUsers);

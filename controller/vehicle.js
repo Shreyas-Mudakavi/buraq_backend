@@ -1,6 +1,7 @@
 const Vehicle = require("../models/Vehicles");
 
 exports.addVehicle = async (req, res, next) => {
+  // extracting all necessary info from body
   const { brand, model, year, license } = req.body;
 
   try {
@@ -12,6 +13,7 @@ exports.addVehicle = async (req, res, next) => {
       license: license,
     });
 
+    // checking if the vehicle is alreadt added or not
     const alreadyExist = await Vehicle.findOne({ license: license });
     if (alreadyExist) {
       res.status(409).json({ msg: "Vehicle already exists!" });
@@ -27,6 +29,7 @@ exports.addVehicle = async (req, res, next) => {
 };
 
 exports.getVehicle = async (req, res, next) => {
+  // getting a single vehicle info
   try {
     const vehicle = await Vehicle.findById(req.params.id);
 
@@ -43,6 +46,7 @@ exports.getVehicle = async (req, res, next) => {
 };
 
 exports.getAllVehicle = async (req, res, next) => {
+  // getting all vehicles list for that driver
   try {
     const vehicle = await Vehicle.find({ userId: req.userId });
 
@@ -59,6 +63,7 @@ exports.getAllVehicle = async (req, res, next) => {
 };
 
 exports.updateVehicle = async (req, res, next) => {
+  // updating a single vehicle with the info changed
   const { brand, model, year } = req.body;
 
   try {
