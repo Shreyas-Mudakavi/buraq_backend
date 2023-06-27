@@ -39,13 +39,6 @@ exports.register = async (req, res, next) => {
       verified = true;
     }
 
-    if (mobile.length < 10) {
-      res
-        .status(401)
-        .json({ msg: "Mobile number should be atleast 10 characters long!" });
-      return;
-    }
-
     // creating a new user object
     const newUser = new User({
       firstname: firstname,
@@ -138,9 +131,6 @@ exports.sendOtp = async (req, res, next) => {
   if (!countryCode || !phoneNumber) {
     return res.status(401).json({ msg: "Enter all Required fields" });
   }
-  if (phoneNumber.length < 10) {
-    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
-  }
 
   try {
     // sending otp to the provided mobile number
@@ -166,9 +156,6 @@ exports.verifyMobileNumber = async (req, res, next) => {
 
   if (!countryCode || !phoneNumber || !otp) {
     return res.status(401).json({ msg: "Enter all Required fields" });
-  }
-  if (phoneNumber.length < 10) {
-    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
   }
 
   try {
@@ -224,9 +211,6 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
   if (!countryCode || !phoneNumber || !otp) {
     return res.status(401).json({ msg: "Enter all Required fields" });
   }
-  if (phoneNumber.length < 10) {
-    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
-  }
 
   try {
     // finding the user with the given phone number
@@ -273,9 +257,6 @@ exports.verifyMobileFrgPwd = async (req, res, next) => {
 
   if (!countryCode || !phoneNumber || !otp) {
     return res.status(401).json({ msg: "Enter all Required fields" });
-  }
-  if (phoneNumber.length < 10) {
-    return res.status(401).json({ msg: "Phone must be atleast 10 characters" });
   }
 
   try {
@@ -352,13 +333,6 @@ exports.changePassword = async (req, res, next) => {
   const hashedPwd = await bcrypt.hash(password, salt);
 
   try {
-    if (mobile.length < 10) {
-      res
-        .status(401)
-        .json({ msg: "Mobile number should be atleast 10 characters long!" });
-      return;
-    }
-
     const user = await User.findOne({ mobile: mobile });
 
     if (!user) {

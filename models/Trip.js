@@ -41,6 +41,10 @@ const TripSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // tripType reserve, instant
+    // startdate
+    // enddate
+    // vehicleref
   },
   { timestamps: true }
 );
