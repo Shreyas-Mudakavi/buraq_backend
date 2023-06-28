@@ -163,7 +163,7 @@ exports.verifyMobileNumber = async (req, res, next) => {
     const user = await User.findOne({ mobile: phoneNumber });
 
     // verifying otp
-    const verificationResponse = await client.verify.v2
+    const verificationResponse = await client.verify
       .services("VAc5765b2512a65da35cbf9e3e352d67e6")
       .verificationChecks.create({
         to: `+${countryCode}${phoneNumber}`,
@@ -173,11 +173,10 @@ exports.verifyMobileNumber = async (req, res, next) => {
     if (verificationResponse.valid) {
       // otp verified but user does not exists
       if (!user) {
-        res.status(200).json({
+        return res.status(200).json({
           status: "Otp verified!",
           phoneNumber: phoneNumber,
         });
-        return;
       }
 
       // comparing passwords
@@ -187,7 +186,6 @@ exports.verifyMobileNumber = async (req, res, next) => {
         return;
       }
 
-      res.status(200).json({ user, token });
       const token = jwt.sign(
         {
           userId: user._id,
@@ -195,6 +193,7 @@ exports.verifyMobileNumber = async (req, res, next) => {
         process.env.JWT_SECRET_KEY,
         { expiresIn: "7d" }
       );
+      res.status(200).json({ user, token });
     } else {
       res.status(400).json({ status: "Wrong OTP!" });
     }
@@ -234,14 +233,14 @@ exports.verifyMobileNumberDriver = async (req, res, next) => {
         return;
       }
 
-      res.status(200).json({ user, token });
-      const token = jwt.sign(
+      const token = await jwt.sign(
         {
           userId: user._id,
         },
         process.env.JWT_SECRET_KEY,
         { expiresIn: "7d" }
       );
+      res.status(200).json({ user, token });
     } else {
       res.status(400).json({ status: "Wrong OTP!" });
     }
@@ -268,11 +267,10 @@ exports.verifyMobileFrgPwd = async (req, res, next) => {
       });
 
     if (verificationResponse.valid) {
-      res.status(200).json({
+      return res.status(200).json({
         status: "Otp verified!",
         phoneNumber: phoneNumber,
       });
-      return;
     } else {
       res.status(400).json({ status: "Wrong OTP!" });
       return;
