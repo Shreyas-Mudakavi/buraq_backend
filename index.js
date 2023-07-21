@@ -46,3 +46,6 @@ app.use("/api/lostItem", lostItemRoutes);
 app.use("/api/review", reviewRoutes);
 
 app.use("/api/admin", adminRoutes);
+
+// fair calculation rapid API: https://rapidapi.com/3b-data-3b-data-default/api/taxi-fare-calculator/
+// // fair calculation uber api : https://developer.uber.com/docs/riders/references/api/v1.2/estimates-price-get#resource
