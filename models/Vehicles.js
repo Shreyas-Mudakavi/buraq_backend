@@ -22,6 +22,10 @@ const vehicleSchema = new Schema(
       required: true,
       unique: true,
     },
+    image: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

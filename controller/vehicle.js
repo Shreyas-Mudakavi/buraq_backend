@@ -2,7 +2,7 @@ const Vehicle = require("../models/Vehicles");
 
 exports.addVehicle = async (req, res, next) => {
   // extracting all necessary info from body
-  const { brand, model, year, license } = req.body;
+  const { brand, model, year, license, image } = req.body;
 
   try {
     const newVehicle = new Vehicle({
@@ -11,6 +11,7 @@ exports.addVehicle = async (req, res, next) => {
       model: model,
       year: year,
       license: license,
+      image: image,
     });
 
     // checking if the vehicle is alreadt added or not
