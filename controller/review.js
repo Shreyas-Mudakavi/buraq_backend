@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const RatingModel = require("../models/RatingModel");
 const ReviewModel = require("../models/ReviewModel");
 const User = require("../models/Users");
@@ -84,10 +85,58 @@ exports.getReview = async (req, res, next) => {
     // getting the list of reviews for that driver
     const review = await ReviewModel.find({ driver: driver });
 
+    const complimentCount = await ReviewModel.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                {
+                  compliment: "Excellent Service",
+                },
+                {
+                  compliment: "Expert Navigation",
+                },
+                {
+                  compliment: "Awesome Service",
+                },
+                {
+                  compliment: "Neet & Tidy",
+                },
+              ],
+            },
+            {
+              driver: new mongoose.Types.ObjectId(driver),
+            },
+          ],
+        },
+      },
+      // {
+      //   $addFields: {
+      //     complimentCount: { $sum: 1 },
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: {
+      //       user: "$user",
+      //       driver: "$driver",
+      //       rating: "$rating",
+      //       compliment: "$compliment",
+      //       comment: "$comment",
+      //       createdAt: "$createdAt",
+      //       updatedAt: "$updatedAt",
+      //     },
+      //     count: { $sum: 1 },
+      //   },
+      // },
+      { $group: { _id: "$compliment", count: { $sum: 1 } } },
+    ]);
+
     // getting ratings for that driver
     const rating = await RatingModel.findOne({ driver: req.userId });
 
-    res.status(200).json({ review, rating });
+    res.status(200).json({ review, rating, complimentCount });
   } catch (err) {
     console.log("get reviews err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
