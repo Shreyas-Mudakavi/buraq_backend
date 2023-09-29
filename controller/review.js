@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const RatingModel = require("../models/RatingModel");
 const ReviewModel = require("../models/ReviewModel");
 const User = require("../models/Users");
+const Trip = require("../models/Trip");
 
 exports.addReview = async (req, res, next) => {
   // extracting all the necessary info from the body
@@ -74,6 +75,8 @@ exports.addReview = async (req, res, next) => {
 exports.getReview = async (req, res, next) => {
   // as this api is called only from the driver side we know that req.userId = driver
   const driver = req.userId;
+  const date = new Date();
+  const year = date.getFullYear();
 
   try {
     // finding the driver from database
@@ -84,6 +87,63 @@ exports.getReview = async (req, res, next) => {
 
     // getting the list of reviews for that driver
     const review = await ReviewModel.find({ driver: driver });
+
+    const totalAcceptance =
+      currDriver.acceptedRides + currDriver.cancelledRides;
+    const acceptanceRate = (currDriver.acceptedRides / totalAcceptance) * 100;
+    const cancelationRate = (currDriver.cancelledRides / totalAcceptance) * 100;
+
+    const numberOfRides = await Trip.aggregate([
+      {
+        $match: {
+          driver: new mongoose.Types.ObjectId(driver),
+        },
+      },
+      // {
+      //   $project: {
+      //     year: { $year: "$currDriver.createdAt" },
+      //   },
+      // },
+      {
+        $group: {
+          _id: 0,
+          totalTrips: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalYears = await User.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(driver),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          year: {
+            $avg: {
+              $dateDiff: {
+                startDate: "$createdAt",
+                endDate: date,
+                unit: "year",
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          numYears: "$year",
+        },
+      },
+    ]);
+
+    const totalRidesDone = {
+      totalTrips: numberOfRides[0].totalTrips,
+      totalYears: totalYears[0].numYears === 0 ? 1 : totalYears[0].numYears,
+    };
 
     const complimentCount = await ReviewModel.aggregate([
       {
@@ -136,7 +196,14 @@ exports.getReview = async (req, res, next) => {
     // getting ratings for that driver
     const rating = await RatingModel.findOne({ driver: req.userId });
 
-    res.status(200).json({ review, rating, complimentCount });
+    res.status(200).json({
+      review,
+      rating,
+      complimentCount,
+      acceptanceRate,
+      cancelationRate,
+      totalRidesDone,
+    });
   } catch (err) {
     console.log("get reviews err ", err);
     res.status(500).json({ err, msg: "Error from server!" });

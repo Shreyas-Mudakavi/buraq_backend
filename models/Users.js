@@ -61,16 +61,18 @@ const userSchema = new Schema(
       type: String,
       // required: [true, 'Profile Pic is required!'],
     },
-    // rating: {
-    //   type: Number,
-    //   default: 0,
-    // },
     inviteCode: {
       type: String,
     },
     verified: {
       type: Boolean,
       default: false,
+    },
+    acceptedRides: {
+      type: Number,
+    },
+    cancelledRides: {
+      type: Number,
     },
   },
   { timestamps: true }
