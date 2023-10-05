@@ -377,6 +377,42 @@ exports.changePassword = async (req, res, next) => {
   }
 };
 
+exports.deleteAcc = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+
+    if (!user) {
+      res.status(404).json({ msg: "User does not exist!" });
+      return;
+    }
+
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ msg: "Account deleted!" });
+  } catch (err) {
+    console.log("deleting user acc err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
+exports.updateStatus = async (req, res, next) => {
+  const { role } = req.body;
+  try {
+    const updatedStatus = await User.findByIdAndUpdate(
+      req.userId,
+      { role: role },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json(updatedStatus);
+  } catch (err) {
+    console.log("update status err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
 // admin side -----------
 exports.adminLogin = async (req, res, next) => {
   const { email, password } = req.body;
