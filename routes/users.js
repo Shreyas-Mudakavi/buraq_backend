@@ -50,7 +50,7 @@ router.get("/user-profile", auth, getProfile);
 router.get("/user-completedDocs", auth, getDocsCompleted);
 
 // getting user delete acc
-router.get("/user-deleteAcc/:id", auth, deleteAcc);
+router.delete("/user-deleteAcc/:id", auth, deleteAcc);
 
 // for updating user status
 router.put("/update-status", auth, updateStatus);
