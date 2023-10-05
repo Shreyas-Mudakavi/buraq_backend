@@ -306,6 +306,19 @@ exports.updateProfile = async (req, res, next) => {
   }
 };
 
+exports.updateDocuments = async (req, res, next) => {
+  try {
+    const updatedDocs = await User.findByIdAndUpdate(req.userId, req.body, {
+      new: true,
+    });
+
+    res.status(200).json(updatedDocs);
+  } catch (err) {
+    console.log("update docs err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
 exports.getProfile = async (req, res, next) => {
   // getting user details
   try {
@@ -319,6 +332,22 @@ exports.getProfile = async (req, res, next) => {
     res.status(200).json(user);
   } catch (err) {
     console.log("get profile err ", err);
+    res.status(500).json({ err, msg: "Error from server!" });
+  }
+};
+
+exports.getDocsCompleted = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      res.status(404).json({ msg: "User not found!" });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.log("get completed docs err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
   }
 };

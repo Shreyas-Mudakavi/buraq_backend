@@ -10,6 +10,8 @@ const {
   sendOtp,
   verifyMobileNumberDriver,
   verifyMobileFrgPwd,
+  updateDocuments,
+  getDocsCompleted,
 } = require("../controller/users");
 const { auth } = require("../middlewares/auth");
 
@@ -36,8 +38,14 @@ router.post("/verify-otp-signup", verifyMobileNumberDriver);
 // for updating user profile
 router.put("/update-profile", auth, updateProfile);
 
+// for updating user docs
+router.put("/update-document", auth, updateDocuments);
+
 // getting user profile details
 router.get("/user-profile", auth, getProfile);
+
+// getting user completed docs details
+router.get("/user-completedDocs", auth, getDocsCompleted);
 
 // reset password link
 router.put("/reset-password", changePassword);
