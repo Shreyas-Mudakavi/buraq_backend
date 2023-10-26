@@ -4,14 +4,25 @@ exports.addWallet = async (req, res, next) => {
   const { balance } = req.body;
 
   try {
-    const newWallet = new Wallet({
-      userId: req.userId,
-      balance: balance,
-    });
+    const alreadyWallet = await Wallet.findOne({ userId: req.userId });
+    if (alreadyWallet) {
+      const wallet = await Wallet.findByIdAndUpdate(
+        alreadyWallet._id,
+        { balance: alreadyWallet.balance + balance },
+        { new: true }
+      );
 
-    const savedWallet = await newWallet.save();
+      return res.status(200).json(wallet);
+    } else {
+      const newWallet = new Wallet({
+        userId: req.userId,
+        balance: balance,
+      });
 
-    res.status(200).json(savedWallet);
+      const savedWallet = await newWallet.save();
+
+      return res.status(200).json(savedWallet);
+    }
   } catch (err) {
     console.log("add wallet err ", err);
     res.status(500).json({ err, msg: "Error from server!" });
@@ -36,6 +47,7 @@ exports.getWallet = async (req, res, next) => {
 
 exports.updateWallet = async (req, res, next) => {
   const { balance } = req.body;
+
   try {
     const wallet = await Wallet.findByIdAndUpdate(
       req.params.id,
