@@ -34,7 +34,7 @@ exports.getWallet = async (req, res, next) => {
     const wallet = await Wallet.findOne({ userId: req.userId });
 
     if (!wallet) {
-      res.status(404).json({ msg: "No wallet found for thr current user!" });
+      res.status(404).json({ msg: "No wallet found for the current user!" });
       return;
     }
 
